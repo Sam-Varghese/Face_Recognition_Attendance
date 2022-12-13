@@ -8,9 +8,9 @@ import tensorflow as tf
 import os
 import shutil
 import cv2 as cv
-import random
+# import random
 import time
-from tensorflow.keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
+# from tensorflow.keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
 from tensorflow.keras.optimizers import Adam
 import mysql.connector
 import json
@@ -656,8 +656,6 @@ def show_menu_items():
                 case 0:
                     # Single user detail retrieval
                     pass
-
-    
 
 while True:
     show_menu_items()
