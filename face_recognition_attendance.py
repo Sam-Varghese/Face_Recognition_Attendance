@@ -1,23 +1,37 @@
 # Importing necessary modules
 
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 from rich import print
 from rich.panel import Panel
 from rich.text import Text
+from rich.console import Console
+from rich.table import Table
 import numpy as np
 import tensorflow as tf
-import os
 import shutil
 import cv2 as cv
-# import random
 import time
-# from tensorflow.keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
 from tensorflow.keras.optimizers import Adam
 import mysql.connector
 import json
 import datetime
 import uuid
 
-json_data = json.loads(open("./connection_info.json").read())
+print("[green]Imported modules[/green]")
+
+try:
+    json_data = json.loads(open("./connection_info.json").read())
+except Exception as e:
+    print("[red]connection_info.json not made[/red] Kindly make a new file namely connection_info.json which will has password to you MySQL database along with other necessary information.\nFormat:")
+    print({
+    "mysql_password": "your_password",
+    "mysql_host": "localhost",
+    "mysql_user": "root",
+    "master_database": "FRAS"
+})
+    input("Press enter once you make that file")
+    json_data = json.loads(open("./connection_info.json").read())
 
 os.system('cls||clear')
 
@@ -25,7 +39,8 @@ os.system('cls||clear')
 con = mysql.connector.connect(
     host = json_data["mysql_host"],
     user = json_data["mysql_user"],
-    password = json_data["mysql_password"]
+    password = json_data["mysql_password"],
+    auth_plugin='mysql_native_password'
 )
 
 if con.is_connected():
@@ -246,8 +261,6 @@ def face_recognition_model():
     img_width = 100
     cursor.execute("SELECT USER_ID FROM USERS ORDER BY MODEL_INDEX;")
     facial_database_member_id = [id[0] for id in cursor.fetchall()]
-    print("Facial member id: ",facial_database_member_id)
-    input()
     num_classes = len(facial_database_member_id)
 
     train_ds = tf.keras.utils.image_dataset_from_directory(
@@ -427,6 +440,37 @@ def get_roles():
 
     return roles
 
+def display_table(table_title: str, columns_list: list, columnwise_values: list):
+    """
+    Function to display data in table structure.
+
+    ---
+
+    Args:
+
+    ---
+
+    `table_title`: Name of the table
+    `columns_list`: List of attributes that should be included in the table
+    `columnwise_values`: List of rows. [[row1 values], [row2 values], ...]
+    """
+    from rich.console import Console
+    from rich.table import Table
+
+    table = Table(title = table_title)
+    colors = ["cyan", "blue", "purple4", "magenta"]
+    import random
+    for column_name in columns_list:
+        table.add_column(column_name, justify = "center", style=random.choice(colors))
+
+    for i in columnwise_values:
+        table.add_row(*i)
+
+    console = Console()
+    console.print(table)
+
+    return True
+
 class menu_item_functions:
 
     """
@@ -604,7 +648,7 @@ def show_menu_items():
 
     item_fns = menu_item_functions()
     os.system('cls||clear')
-    menu_0_0 = terminal_menu(">>>>===FRAS Features===<<<<", ["Create new", "FRAS", "Retrieve details of users", "Retrieve attendance record", "Exit program"])
+    menu_0_0 = terminal_menu(">>>>===FRAS Features===<<<<", ["Create new", "FRAS", "Retrieve details of users", "Retrieve attendance record", "Train model"])
 
     menu_1_0 = terminal_menu("Creator", ["Create new user", "Create new role"])
     
@@ -655,9 +699,52 @@ def show_menu_items():
 
                 case 0:
                     # Single user detail retrieval
-                    pass
+                    roles_list = get_roles()
+                    role_counter = 1
+
+                    for role in roles_list:
+                        print("{}) {} (ID: {})".format(role_counter, role[0], role[1]))
+                        role_counter += 1
+
+                    selected_role = roles_list[int(input("Select the role which the user belongs to: ")) - 1]
+
+                    cursor.execute("select * from users where user_id in (select user_id from user_roles where role_id = '{}');".format(selected_role[1]))
+
+                    user_counter = 1
+                    users_data = cursor.fetchall()
+                    for user in users_data:
+
+                        print("{}) {} (ID: {})".format(user_counter, user[0], user[1]))
+                        user_counter += 1
+                    selected_user = users_data[int(input("Enter the index of user whose details you would like to retrieve: "))-1]
+                    display_table(selected_user[0], ["Name", "ID", "Date of Joining"], [[selected_user[0], selected_user[1], selected_user[3]]])
+                    input("Press enter if you've viewed this table: ")
+
+                case 1:
+                    # Retrieve details of users with a role
+                    roles_list = get_roles()
+                    roles_counter = 1
+
+                    for role in roles_list:
+                        print("{}) {} (ID: {})".format(roles_counter, role[0], role[1]))
+                        roles_counter += 1
+
+                    selected_role = roles_list[int(input("Enter the index of the role you selected: ")) - 1]
+                    
+                    cursor.execute("select * from users where user_id in (select user_id from user_roles where role_id = '{}');".format(selected_role[1]))
+                    users_data = cursor.fetchall()
+                    data = []
+                    for i in users_data:
+                        i = list(i)
+                        del i[2]
+                        del i[-1]
+                        data.append(i)
+                    users_data = data
+                    display_table(selected_role[0], ["Name", "User ID", "Joining Date"], users_data)
+                    input("Press enter if you've viewed the data: ")
+
+        case 4:
+            face_recognition_model()
 
 while True:
     show_menu_items()
-
-# face_recognition_model()
