@@ -11,11 +11,15 @@ FRAS is a facial recognition attendance system that aims at simplifying the proc
 
 <img src = "https://149695847.v2.pressablecdn.com/wp-content/uploads/2020/10/face.jpg">
 
+---
+
 ## Requirements
 
 - Python
 - MySQL
 - Laptop with a camera
+
+---
 
 ## Features
 
@@ -25,6 +29,8 @@ FRAS is a facial recognition attendance system that aims at simplifying the proc
 - Model is saved after it's trained everytime which enables the user to re-run the saved model instead of training it again and again on images of all users.
 - All the tables in MySQL are well connected and efforts are being taken constantly to reduce redundancies to max extent.
 - Entity Relation diagram is also maintained.
+
+---
 
 ## How to Use
 
@@ -45,3 +51,9 @@ FRAS is a facial recognition attendance system that aims at simplifying the proc
 
 6. Install the required packages by executing the following command `pip install -r requirements.txt`
 7. Now execute [face_recognition_attendance.py](face_recognition_attendance.py) file.
+
+---
+
+## Additional Information
+
+- Project is licensed under [MIT License](./LICENSE)
