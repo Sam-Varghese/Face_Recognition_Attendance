@@ -32,7 +32,7 @@ FRAS is a facial recognition attendance system that aims at simplifying the proc
 
 ---
 
-## How to Use
+## Installation
 
 1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the repository.
 2. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) the forked repository.
@@ -51,6 +51,15 @@ FRAS is a facial recognition attendance system that aims at simplifying the proc
 
 6. Install the required packages by executing the following command `pip install -r requirements.txt`
 7. Now execute [face_recognition_attendance.py](face_recognition_attendance.py) file.
+
+---
+
+## Description
+
+1. This program consists of 2 entities: namely `users` and `roles`.
+2. Roles are the tags assigned to a particular user.
+3. Ex: If a user "A" belongs to grade 6th, then create a role "6th grade" which you can assign to the user.
+4. Before program learns to recognize the face of a user, it needs to 
 
 ---
 

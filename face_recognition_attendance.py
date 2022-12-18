@@ -17,6 +17,9 @@ import mysql.connector
 import json
 import datetime
 import uuid
+import pyttsx3
+
+engine = pyttsx3.init()
 
 print("[green]Imported modules[/green]")
 
@@ -66,6 +69,11 @@ try:
     os.mkdir(ml_model_directory)
 except Exception as e:
     pass
+
+def speak_text(text: str):
+
+    engine.say(text)
+    engine.runAndWait()
 
 def get_unique_id():
     """
@@ -218,22 +226,25 @@ def record_face(person_name: str, person_id: str, count: int = 100, sleep_secs: 
         pass
 
     person_name = person_name.replace(" ", "-")
+    print("Working for person ", person_name, person_id)
 
-    if re_register:
-
+    folder_name = [i for i in os.listdir(facial_database_directory) if person_id in i]
+    print(folder_name)
+    if(len(folder_name) != 0):
         try:
-            shutil.rmtree(os.path.join(facial_database_directory, person_id))
+            shutil.rmtree(os.path.join(facial_database_directory, folder_name[0]))
         except Exception:
             pass
-
-    os.mkdir(os.path.join(facial_database_directory, person_id))
+    folder_name = str(len(os.listdir(facial_database_directory))) +"_"+ person_id
+    
+    os.mkdir(os.path.join(facial_database_directory, folder_name))
     
     while image_count != count:
 
         isTrue, frame = capture.read()
-        print("Saving as ", ".\{}\{}\{}_{}.png".format(facial_database_directory, person_id, image_count, person_name))
+        print("Saving as ", ".\{}\{}\{}_{}.png".format(facial_database_directory, folder_name, image_count, person_name))
 
-        cv.imwrite(".\{}\{}\{}_{}.png".format(facial_database_directory, person_id, image_count, person_name), frame)
+        cv.imwrite(".\{}\{}\{}_{}.png".format(facial_database_directory, folder_name, image_count, person_name), frame)
 
         cv.imshow('Video input', frame)
 
@@ -257,8 +268,8 @@ def face_recognition_model():
     """
 
     batch_size = 32
-    img_height = 100
-    img_width = 100
+    img_height = 200
+    img_width = 200
     cursor.execute("SELECT USER_ID FROM USERS ORDER BY MODEL_INDEX;")
     facial_database_member_id = [id[0] for id in cursor.fetchall()]
     num_classes = len(facial_database_member_id)
@@ -267,6 +278,7 @@ def face_recognition_model():
         facial_database_directory,
         validation_split = 0.2,
         subset = "training",
+        color_mode = "grayscale",
         seed = 123,
         image_size = (img_height, img_width),
         batch_size = batch_size
@@ -275,6 +287,7 @@ def face_recognition_model():
         facial_database_directory,
         validation_split = 0.2,
         subset = "validation",
+        color_mode = "grayscale",
         seed = 123,
         image_size = (img_height, img_width),
         batch_size = batch_size
@@ -290,6 +303,9 @@ def face_recognition_model():
         tf.keras.layers.Rescaling(1./255),
         
         tf.keras.layers.Conv2D(32, 3, activation = "relu"),
+        tf.keras.layers.MaxPooling2D(),
+
+        tf.keras.layers.Conv2D(64, 3, activation = "relu"),
         tf.keras.layers.MaxPooling2D(),
 
         tf.keras.layers.Conv2D(32, 3, activation = "relu"),
@@ -347,7 +363,6 @@ def predict_frame(model, frame):
     `Status`: True/ False depending on whether anybody was identified with a certain level of accuracy.
     `User ID`: If the status is True, then function will also return the User ID of the identified user in the frame. Else it'll return None
     """
-
     successive_feature_maps = model.predict(frame)
 
     # Get ID's of users in order of successive_feature_maps
@@ -362,11 +377,15 @@ def predict_frame(model, frame):
 
     # Confirm a frame to be of a user only if predicted probability comes out to be > 60%
     print("Max probability is: ",max_predicted_probability, successive_feature_maps, predicted_user_ids)
-    if(max_predicted_probability <= 0.65):
+    if(max_predicted_probability <= 0.60):
         return [False, None]
 
     else:
         return [True, predicted_user_ids[list(successive_feature_maps[0]).index(max_predicted_probability)]]
+
+def identify_image():
+
+    pass
 
 def recognize_face():
 
@@ -390,16 +409,20 @@ def recognize_face():
     while True:
 
         isTrue, frame = capture.read()
-        frame = cv.resize(frame, (100, 100))
+        frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        frame = cv.resize(frame, (200, 200))
         frame = np.array(frame)
         frame = frame.reshape((1, )+ frame.shape)
-        time.sleep(1)
 
         prediction = predict_frame(model, frame)
+        
+        time.sleep(1)
 
         if(prediction[0]):
             cursor.execute("SELECT USER_NAME FROM USERS WHERE USER_ID = '{}';".format(prediction[1]))
-            print("[green]Identified {}[/green]".format(cursor.fetchall()[0][0].replace("-", " ").title()))
+            identified_person = cursor.fetchall()[0][0].replace("-", " ").title()
+            speak_text("Identified {}".format(identified_person))
+            print("[green]Identified {}[/green]".format(identified_person))
             cursor.execute("SELECT USER_ID FROM ATTENDANCE_RECORDS WHERE TIME_STAMP LIKE '{}%' AND USER_ID = '{}';".format(get_dd_mm_yyyy(), prediction[1]))
             
             # If attendance of the identified has already been marked anytime in that day, then no need to mark it again
@@ -621,6 +644,9 @@ class terminal_menu:
     def set_previous_terminal_menu(self, menu):
         self.previous_terminal_menu = menu
 
+    def show_previous_terminal_menu(self):
+        self.previous_terminal_menu
+
     def display(self):
 
         if(self.title != ""):
@@ -636,6 +662,10 @@ class terminal_menu:
         print("[cyan]Please enter the task index: [/cyan]", end = " ")
         item_selected = int(input()) - 1 # Because counter started from 1, not 0
 
+        if(item_selected == len(self.options_list) -1):
+
+            self.show_previous_terminal_menu()
+
         return item_selected
 
 def show_menu_items():
@@ -648,17 +678,20 @@ def show_menu_items():
 
     item_fns = menu_item_functions()
     os.system('cls||clear')
-    menu_0_0 = terminal_menu(">>>>===FRAS Features===<<<<", ["Create new", "FRAS", "Retrieve details of users", "Retrieve attendance record", "Train model"])
+    menu_0_0 = terminal_menu(">>>>===FRAS Features===<<<<", ["Create new", "FRAS", "Retrieve details of users", "Retrieve attendance record", "Train model", "Deletion"])
 
-    menu_1_0 = terminal_menu("Creator", ["Create new user", "Create new role"])
+    menu_1_0 = terminal_menu("Creator", ["Create new user", "Create new role", "Back"])
     
-    menu_1_1 = terminal_menu("Retriever", ["Retrieve details of single user", "Retrieve details of users with specific roles", "Export role wise data to excel"])
+    menu_1_1 = terminal_menu("Retriever", ["Retrieve details of single user", "Retrieve details of users with specific roles", "Export role wise data to excel", "Back"])
 
-    menu_1_2 = terminal_menu("FRAS", ["Record new face", "Start FRAS"])
+    menu_1_2 = terminal_menu("FRAS", ["Record new face", "Start FRAS", "Back"])
+
+    menu_1_3 = terminal_menu("[red]Deletion[/red]", ["Delete user", "Delete role", "Back"])
 
     menu_1_0.previous_terminal_menu = menu_0_0
     menu_1_1.previous_terminal_menu = menu_0_0
     menu_1_2.previous_terminal_menu = menu_0_0
+    menu_1_3.previous_terminal_menu = menu_0_0
 
     menu_0_0_inp = menu_0_0.display()
 
@@ -745,6 +778,35 @@ def show_menu_items():
 
         case 4:
             face_recognition_model()
+
+        case 5:
+            # Deletion
+            menu_1_3_inp = menu_1_3.display()
+
+            roles_list = get_roles()
+
+            match menu_1_3:
+
+                case 0:
+                    # Delete a user
+                    roles_counter = 1
+                    for role in roles_list:
+
+                        print("{}) {} (ID: )".format(roles_counter, role[0], role[1]))
+                        roles_counter += 1
+
+                    selected_role = roles_list[int(input("Select the role which the user belongs to: ")) - 1]
+
+                    cursor.execute("select * from users where user_id in (select user_id from user_roles where role_id = '{}');".format(selected_role[1]))
+
+                    user_counter = 1
+                    users_data = cursor.fetchall()
+                    for user in users_data:
+
+                        print("{}) {} (ID: {})".format(user_counter, user[0], user[1]))
+                        user_counter += 1
+                        
+                    selected_user = users_data[int(input("Enter the index of user whose details you would like to retrieve: "))-1]
 
 while True:
     show_menu_items()
