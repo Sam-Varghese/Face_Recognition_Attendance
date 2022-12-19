@@ -75,6 +75,29 @@ FRAS is a facial recognition attendance system that aims at simplifying the proc
 
 ---
 
+## Technologies Used
+
+- [Python](https://www.python.org/)
+- [Tensorflow](https://www.tensorflow.org/)
+- [MySQL](https://www.wikiwand.com/en/SQL)
+- [Rich](https://github.com/Textualize/rich)
+- [OpenCV](https://opencv.org/about/)
+
+---
+
+## Concepts Used
+
+- [Neural Networks](https://www.wikiwand.com/en/Neural_network) (Learned this during my ML Specialization from Stanford Online, and Tensorflow Developer specialization from DeepLearning.AI)
+- [Database Management System](https://www.ibm.com/docs/en/zos-basic-skills?topic=zos-what-is-database-management-system) (Learned in my 3rd semester, at NMIMS University)
+
+---
+
 ## Additional Information
 
 - Project is licensed under [MIT License](./LICENSE)
+- This project is made by [Sam Varghese](https://www.linkedin.com/in/sam-varghese2003/) to apply the concepts learned in my 3rd Semester, and AI courses that I completed from Coursera.
+
+## Contact
+
+![sam.varg.2003@gmail.com](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)
+![Linkedin](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)
