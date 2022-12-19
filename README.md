@@ -59,7 +59,19 @@ FRAS is a facial recognition attendance system that aims at simplifying the proc
 1. This program consists of 2 entities: namely `users` and `roles`.
 2. Roles are the tags assigned to a particular user.
 3. Ex: If a user "A" belongs to grade 6th, then create a role "6th grade" which you can assign to the user.
-4. Before program learns to recognize the face of a user, it needs to 
+4. Before program learns to recognize the face of a user, it needs to generate a dataset of all users.
+5. So after you enter records of a new user, `Start FRAS` -> `Record new face`.
+6. After this, just select the name of user, and program will start recording images of the user.
+7. Now you need to train the model. Option 5 is `Train model` which needs to be selected.
+8. After the model is trained, `FRAS`-> `Start FRAS`
+
+---
+
+## Future Plans
+
+- [ ] Support incremental learning so that recorded images may be deleted, and storage space may get saved.
+- [ ] Make a website for this project.
+- [ ] Make the model focus more on faces of people than their physical background, which sometimes cause model to behave incorrectly.
 
 ---
 
