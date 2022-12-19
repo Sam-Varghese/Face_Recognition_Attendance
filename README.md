@@ -7,7 +7,7 @@
 
 ## Face Recognition Attendance System
 
-FRAS is a facial recognition attendance system that aims at simplifying the process of attendance management with the help of state-of-art AI technologies like Tensorflow, Convolutional Neural Networks, etc.
+FRAS is a ==Facial Recognition Attendance System== that aims at simplifying the process of attendance management with the help of state-of-art AI technologies like Tensorflow, Convolutional Neural Networks, etc.
 
 <img src = "https://149695847.v2.pressablecdn.com/wp-content/uploads/2020/10/face.jpg">
 
