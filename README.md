@@ -99,5 +99,7 @@ FRAS is a facial recognition attendance system that aims at simplifying the proc
 
 ## Contact
 
-![sam.varg.2003@gmail.com](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)
-![Linkedin](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)
+<a href = "mailto:sam.varg.2003@gmail.com"><img src = "https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" /></a>
+
+<a href = "https://www.linkedin.com/in/sam-varghese2003/">
+<img src ="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
